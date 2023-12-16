@@ -1,46 +1,91 @@
-const { NotImplementedError } = require('../extensions/index.js');
-
-// const { Node } = require('../extensions/list-tree.js');
+const {NotImplementedError} = require('../extensions/index.js');
+const {Node} = require('../extensions/list-tree.js');
 
 /**
-* Implement simple binary search tree according to task description
-* using Node from extensions
-*/
+ * Implement simple binary search tree according to task description
+ * using Node from extensions
+ */
 class BinarySearchTree {
+  constructor() {
+    this.rootNode = null
+  }
 
   root() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+    return this.rootNode
   }
 
-  add(/* data */) {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+  add(data) {
+    const newNode = new Node(data)
+    this.rootNode
+      ? this.insertNode(this.rootNode, newNode)
+      : this.rootNode = newNode
   }
 
-  has(/* data */) {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+  insertNode(node, newNode) {
+    const directionToInsert = this.getDirection(newNode.data, node.data)
+    node[directionToInsert] === null
+      ? node[directionToInsert] = newNode
+      : this.insertNode(node[directionToInsert], newNode)
   }
 
-  find(/* data */) {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+  has(data) {
+    return !!this.findNode(this.rootNode, data)
   }
 
-  remove(/* data */) {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+  find(data) {
+    return this.findNode(this.rootNode, data)
+  }
+
+  findNode(node, data) {
+    if (node === null || data === node.data) return node
+
+    const directionToFind = this.getDirection(data, node.data)
+    return this.findNode(node[directionToFind], data)
+  }
+
+  remove(data) {
+    this.rootNode = this.removeNode(this.rootNode, data)
+  }
+
+  removeNode(node, data) {
+    if (node === null) return null
+
+    if (data !== node.data) {
+      const direction = this.getDirection(data, node.data)
+      node[direction] = this.removeNode(node[direction], data)
+      return node
+    }
+
+    if (node.left === null) return node.right
+    if (node.right === null) return node.left
+
+    const minRightNode = this.findMinNode(node.right)
+    node.data = minRightNode.data
+    node.right = this.removeNode(node.right, minRightNode.data)
+
+    return node
+  }
+
+  findMinNode(node) {
+    return node.left === null
+      ? node
+      : this.findMinNode(node.left)
   }
 
   min() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+    return this.findMinNode(this.rootNode).data
   }
 
-  max() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+  max(node = this.rootNode) {
+    return node.right === null
+      ? node.data
+      : this.max(node.right)
+  }
+
+  getDirection(newNodeData, existingNodeData) {
+    return newNodeData > existingNodeData
+      ? 'right'
+      : 'left'
   }
 }
 
